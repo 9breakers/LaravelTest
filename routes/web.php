@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\CommentController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -16,3 +17,7 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', function () {
     return view('welcome');
 });
+
+Route::get('/comment', [CommentController::class, 'index'])->name('comment');
+Route::get('/reload-captcha',[CommentController::class, 'reloadCaptcha']);
+Route::post('/commentPost', [CommentController::class, 'captchaPost'])->name('post');
