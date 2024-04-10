@@ -5,3 +5,10 @@
 */
 // This file is intentionally blank
 // Use this file to add JavaScript to your project
+
+document.querySelectorAll('.toggle-replies').forEach(button => {
+    button.addEventListener('click', function() {
+        let nestedComments = this.closest('.comment').querySelector('.nested-comments');
+        nestedComments.classList.toggle('d-none');
+    });
+});

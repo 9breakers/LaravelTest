@@ -35,7 +35,7 @@
             <div class="card bg-light">
                 <div class="card-body">
                     <!-- Comment form-->
-                    <form method="POST" action="{{route('post')}}" class="mt-3">
+                    <form method="POST" action="{{route('comments.store')}}" class="mt-3">
                         @csrf
                         <div class="form-group">
                             <label for="username">User Name</label>
@@ -84,48 +84,113 @@
 
     </div>
 
-    <!-- Comments section-->
+
+
     <div class="row">
-        <section class="mb-5">
-            <div class="card bg-light">
-                <div class="card-body">
-                    <!-- Comment with nested comments-->
-                    <div class="d-flex mb-4">
-                        <!-- Parent comment-->
-                        <div class="flex-shrink-0"><img class="rounded-circle" src="https://dummyimage.com/50x50/ced4da/6c757d.jpg" alt="..." /></div>
-                        <div class="ms-3">
-                            <div class="fw-bold">Commenter Name</div>
-                            If you're going to lead a space frontier, it has to be government; it'll never be private enterprise. Because the space frontier is dangerous, and it's expensive, and it has unquantified risks.
-                            <!-- Child comment 1-->
-                            <div class="d-flex mt-4">
-                                <div class="flex-shrink-0"><img class="rounded-circle" src="https://dummyimage.com/50x50/ced4da/6c757d.jpg" alt="..." /></div>
-                                <div class="ms-3">
-                                    <div class="fw-bold">Commenter Name</div>
-                                    And under those conditions, you cannot establish a capital-market evaluation of that enterprise. You can't get investors.
-                                </div>
-                            </div>
-                            <!-- Child comment 2-->
-                            <div class="d-flex mt-4">
-                                <div class="flex-shrink-0"><img class="rounded-circle" src="https://dummyimage.com/50x50/ced4da/6c757d.jpg" alt="..." /></div>
-                                <div class="ms-3">
-                                    <div class="fw-bold">Commenter Name</div>
-                                    When you put money directly to a problem, it makes a good headline.
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- Single comment-->
-                    <div class="d-flex">
-                        <div class="flex-shrink-0"><img class="rounded-circle" src="https://dummyimage.com/50x50/ced4da/6c757d.jpg" alt="..." /></div>
-                        <div class="ms-3">
-                            <div class="fw-bold">Commenter Name</div>
-                            When I look at the universe and all the ways the universe wants to kill us, I find it hard to reconcile that with statements of beneficence.
-                        </div>
-                    </div>
-                </div>
+        <div class="col-md-12">
+            <!-- Кнопки сортування -->
+            <div class="d-flex mb-3">
+                <a href="{{ route('comments.index', ['sortBy' => 'username', 'sortDirection' => $sortDirection === 'asc' ? 'desc' : 'asc']) }}" class="btn btn-sm btn-primary me-2">Сортувати за ім'ям</a>
+                <!-- Кнопка для сортування за E-mail -->
+                <a href="{{ route('comments.index', ['sortBy' => 'email', 'sortDirection' => $sortDirection === 'asc' ? 'desc' : 'asc']) }}" class="btn btn-sm btn-primary me-2">Сортувати за E-mail</a>
+                <!-- Кнопка для сортування за датою додавання -->
+                <a href="{{ route('comments.index', ['sortBy' => 'created_at', 'sortDirection' => $sortDirection === 'asc' ? 'desc' : 'asc']) }}" class="btn btn-sm btn-primary me-2">Сортувати за датою додавання</a>
             </div>
-        </section>
+
+            <!-- Секція з коментарями -->
+            <section class="mb-5">
+                <div class="card bg-light">
+                    <div class="card-body">
+                        <!-- Виведення коментарів та їх дочірніх коментарів -->
+                        @foreach($comments as $comment)
+                            <div class="comment">
+                                <!-- Батьківський коментар -->
+                                <div class="comment-body">
+                                    <div class="d-flex">
+                                        <div class="flex-shrink-0"><img class="rounded-circle" src="https://dummyimage.com/50x50/ced4da/6c757d.jpg" alt="..." /></div>
+                                        <div class="ms-3">
+
+                                            <div class="fw-bold">{{ $comment->username }}</div>
+                                            <div class="fw-bold">{{ $comment->email }}</div>
+                                            <div class="fw-bold">{{ $comment->created_at }}</div>
+                                            {{ $comment->text }}
+                                        </div>
+                                    </div>
+
+                                    <div class="mt-3">
+                                        <form action="{{ route('reply.form', ['comment' => $comment->id]) }}" method="GET">
+                                            @csrf
+                                            <button type="submit" class="btn btn-sm btn-primary">Відповісти</button>
+                                        </form>
+                                    </div>
+
+                                    <div class="mt-3">
+                                        <button type="button" class="btn btn-sm btn-link toggle-replies">...</button>
+                                    </div>
+
+                                    <div class="nested-comments d-none">
+                                        @if(count($comment->replies) > 0)
+                                            @foreach($comment->replies as $reply)
+                                                <div class="nested-comment ms-5">
+                                                    <div class="comment-body">
+                                                        <div class="d-flex">
+                                                            <div class="flex-shrink-0"><img class="rounded-circle" src="https://dummyimage.com/50x50/ced4da/6c757d.jpg" alt="..." /></div>
+                                                            <div class="ms-3">
+                                                                <div class="fw-bold">{{ $comment->username }}</div>
+                                                                <div class="fw-bold">{{ $comment->email }}</div>
+                                                                <div class="fw-bold">{{ $comment->created_at }}</div>
+                                                                {{ $reply->text }}
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="mt-3">
+                                                            <form action="{{ route('reply.form', ['comment' => $reply->id]) }}" method="GET">
+                                                                @csrf
+                                                                <button type="submit" class="btn btn-sm btn-primary">Відповісти</button>
+                                                            </form>
+                                                        </div>
+
+                                                        @foreach($reply->replies as $nestedReply)
+                                                            <div class="nested-comment ms-5">
+                                                                <div class="comment-body">
+                                                                    <div class="d-flex">
+                                                                        <div class="flex-shrink-0"><img class="rounded-circle" src="https://dummyimage.com/50x50/ced4da/6c757d.jpg" alt="..." /></div>
+                                                                        <div class="ms-3">
+                                                                            <div class="fw-bold">{{ $comment->username }}</div>
+                                                                            <div class="fw-bold">{{ $comment->email }}</div>
+                                                                            <div class="fw-bold">{{ $comment->created_at }}</div>
+                                                                            {{ $nestedReply->text }}
+                                                                        </div>
+                                                                    </div>
+
+                                                                    <div class="mt-3">
+                                                                        <form action="{{ route('reply.form', ['comment' => $nestedReply->id]) }}" method="GET">
+                                                                            @csrf
+                                                                            <button type="submit" class="btn btn-sm btn-primary">Відповісти</button>
+                                                                        </form>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        @endforeach
+                                                    </div>
+                                                </div>
+                                            @endforeach
+                                        @endif
+                                    </div>
+                                </div>
+                            </div>
+                        @endforeach
+
+                    </div>
+
+                    {{ $comments->links() }}
+                </div>
+            </section>
+        </div>
     </div>
+
+
+
 </div>
 
 </body>

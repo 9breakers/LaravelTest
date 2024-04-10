@@ -18,6 +18,8 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('/comment', [CommentController::class, 'index'])->name('comment');
+Route::get('/comments', [CommentController::class, 'index'])->name('comments.index');
+Route::post('/comments', [CommentController::class, 'store'])->name('comments.store');
+Route::get('/comments/{comment}/reply', [CommentController::class, 'showReplyForm'])->name('reply.form');
+Route::post('/comments/{comment}/reply', [CommentController::class, 'createReply'])->name('comments.reply');
 Route::get('/reload-captcha',[CommentController::class, 'reloadCaptcha']);
-Route::post('/commentPost', [CommentController::class, 'captchaPost'])->name('post');
