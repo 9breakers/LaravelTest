@@ -28,7 +28,6 @@
         </div>
     </div>
 </nav>
-
 <div class="container mt-5">
     <div class="row">
 
@@ -38,6 +37,15 @@
                     <!-- Comment form-->
                     <form method="POST" action="{{route('comments.store')}}" class="mt-3" enctype="multipart/form-data">
                         @csrf
+                        @if ($errors->any())
+                            <div class="alert alert-danger">
+                                <ul>
+                                    @foreach ($errors->all() as $error)
+                                        <li>{{ $error }}</li>
+                                    @endforeach
+                                </ul>
+                            </div>
+                        @endif
                         <div class="form-group">
                             <label for="username">User Name</label>
                             <input type="text" class="form-control" id="username" name="username">
@@ -117,9 +125,18 @@
                                                 </div>
                                             </div>
                                             <div>
-                                                <a href="{{$comment->image}}" data-lightbox="image-1" data-title="My caption">Image #1</a>
+                                                @if($comment->image)
+                                                    @php
+                                                        $extension = pathinfo($comment->image, PATHINFO_EXTENSION);
+                                                    @endphp
+                                                    @if($extension === 'txt')
+                                                        <a href="{{$comment->image}}" download>Download Text File</a>
+                                                    @else
+                                                        <a href="{{$comment->image}}" data-lightbox="image-1" data-title="My caption">Image</a>
+                                                    @endif
+                                                @endif
                                             </div>
-                                            <p>{{ $comment->text }}</p>
+                                            <p>{!! $comment->text !!}</p>
                                             <div class="mt-3">
                                                 <form action="{{ route('reply.form', ['comment' => $comment->id]) }}" method="GET">
                                                     @csrf
@@ -196,9 +213,9 @@
     <script src="{{ asset('lightbox2/lightbox.js') }}"></script>
 <script>
     function validateFile(fileInput) {
-        var file = fileInput.files[0];
-        var fileName = file.name;
-        var fileExtension = fileName.split('.').pop().toLowerCase();
+        let file = fileInput.files[0];
+        let fileName = file.name;
+        let fileExtension = fileName.split('.').pop().toLowerCase();
 
         if (fileExtension === 'txt') {
             var maxSize = 100 * 1024; // 100 кб у байтах
@@ -225,8 +242,8 @@
             }
         });
     });
+
 </script>
 </div>
-
 </body>
 </html>

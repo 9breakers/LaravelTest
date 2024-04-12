@@ -26,11 +26,37 @@ class CommentController extends Controller
         return response()->json(['captcha'=>captcha_img()]);
     }
 
-
     public function store(CommentRequest $request)
     {
+        $allowedTags = ['a', 'code', 'i', 'strong'];
+        $commentText = $request->input('text');
+        $valid = true;
+
+        foreach ($allowedTags as $tag) {
+            $openingTagPattern = "/<$tag\b[^>]*>/";
+            $closingTagPattern = "/<\/$tag>/";
+
+            $openingTagCount = preg_match_all($openingTagPattern, $commentText);
+            $closingTagCount = preg_match_all($closingTagPattern, $commentText);
+
+            if ($openingTagCount !== $closingTagCount) {
+                $valid = false;
+                $errorMessage = 'Не всі дозволені теги правильно закриті. Будь ласка, перевірте свій коментар і закрийте всі відкриті теги.';
+                break;
+            }
+        }
+
+        if ($valid && preg_match("/<(?!\/?(" . implode('|', $allowedTags) . ")\b)[^>]+>/i", $commentText)) {
+            $valid = false;
+            $errorMessage = 'Заборонені теги в коментарі. Будь ласка, перевірте свій коментар і видаліть неприпустимі теги.';
+        }
+
+        if (!$valid) {
+            return redirect()->back()->withInput()->with('error', $errorMessage);
+        }
+
         $comment = Comment::create([
-            'text' => $request->input('text'),
+            'text' => $commentText,
             'username' => $request->input('username'),
             'email' => $request->input('email'),
             'parent_id' => null,
@@ -41,22 +67,23 @@ class CommentController extends Controller
             $fileName = time() . '_' . $file->getClientOriginalName();
 
             $mimeType = $file->getMimeType();
-            $folder = '';
-
             if (strpos($mimeType, 'image/') === 0) {
                 $folder = 'images';
             } elseif (strpos($mimeType, 'text/') === 0) {
                 $folder = 'text';
             } else {
-
                 $folder = 'other';
             }
             $filePath = $file->storeAs("public/{$folder}", $fileName);
             $comment->image = str_replace('public', 'storage', $filePath);
             $comment->save();
         }
+
         return redirect()->route('comments.index');
     }
+
+
+
 
 
 
@@ -75,7 +102,6 @@ class CommentController extends Controller
             'email' => $request->input('email'),
             'parent_id' => $parentId,
         ]);
-
         return redirect()->route('/comments.index');
     }
 }
