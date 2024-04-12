@@ -35,7 +35,7 @@
             <div class="card bg-light">
                 <div class="card-body">
                     <!-- Comment form-->
-                    <form method="POST" action="{{route('comments.store')}}" class="mt-3" enctype="multipart/form-data">
+                    <form method="POST" action="{{ route('comments.store') }}" class="mt-3" enctype="multipart/form-data">
                         @csrf
                         @if ($errors->any())
                             <div class="alert alert-danger">
@@ -50,45 +50,50 @@
                             <label for="username">User Name</label>
                             <input type="text" class="form-control" id="username" name="username">
                             @error('username')
-                            <label for="" class="text-danger">{{$message}}</label>
+                            <label for="" class="text-danger">{{ $message }}</label>
                             @enderror
                         </div>
 
                         <div class="form-group">
                             <label for="email">E-mail</label>
-                            <input type="email" class="form-control" id="email" name="email" >
+                            <input type="email" class="form-control" id="email" name="email">
                             @error('email')
-                            <label for="" class="text-danger">{{$message}}</label>
+                            <label for="" class="text-danger">{{ $message }}</label>
                             @enderror
                         </div>
 
-                        <div class="form-group mt-2  mb-2">
+                        <div class="form-group mt-2 mb-2">
                             <div class="captcha">
                                 <span>{!! captcha_img() !!}</span>
-                                <button type="button" class="btn btn-danger reload" id="reload">  &#x21bb;</button>
+                                <button type="button" class="btn btn-danger reload" id="reload">&#x21bb;</button>
                             </div>
                         </div>
 
                         <div class="form-group mt-2">
                             <input type="text" class="form-control" placeholder="Enter Captcha" name="captcha">
                             @error('captcha')
-                            <label for="" class="text-danger">{{$message}}</label>
+                            <label for="" class="text-danger">{{ $message }}</label>
                             @enderror
                         </div>
 
-
                         <div class="form-group">
                             <label for="text">Text</label>
-                            <textarea class="form-control" id="text" name="text" ></textarea>
+                            <div class="btn-group" role="group" aria-label="Basic example">
+                                <button type="button" class="btn btn-secondary" onclick="insertTag('i')">i</button>
+                                <button type="button" class="btn btn-secondary" onclick="insertTag('strong')">strong</button>
+                                <button type="button" class="btn btn-secondary" onclick="insertTag('code')">code</button>
+                                <button type="button" class="btn btn-secondary" onclick="insertLink()">a href=""</button>
+                            </div>
+                            <textarea class="form-control" id="text" name="text"></textarea>
                             @error('text')
-                            <label for="" class="text-danger">{{$message}}</label>
+                            <label for="" class="text-danger">{{ $message }}</label>
                             @enderror
                         </div>
 
                         <div class="form-group">
                             <input type="file" name="file">
                             @error('file')
-                            <label for="" class="text-danger">{{$message}}</label>
+                            <label for="" class="text-danger">{{ $message }}</label>
                             @enderror
                         </div>
                         <button type="submit" class="btn btn-primary mb-3 mt-3">Submit</button>
@@ -96,6 +101,7 @@
                 </div>
             </div>
         </section>
+
 
         <div class="container mt-5">
             <div class="row">
@@ -136,7 +142,7 @@
                                                     @endif
                                                 @endif
                                             </div>
-                                            <p>{!! $comment->text !!}</p>
+                                         <p> {!! html_entity_decode($comment->text) !!}</p>
                                             <div class="mt-3">
                                                 <form action="{{ route('reply.form', ['comment' => $comment->id]) }}" method="GET">
                                                     @csrf
@@ -212,6 +218,55 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
     <script src="{{ asset('lightbox2/lightbox.js') }}"></script>
 <script>
+
+    function insertTag(tag) {
+        let textarea = document.getElementById('text');
+        let startTag = '<' + tag + '>';
+        let endTag = '</' + tag + '>';
+
+        // Отримати положення курсору в текстовому полі
+        let startPos = textarea.selectionStart;
+        let endPos = textarea.selectionEnd;
+
+        // Отримати виділений текст
+        let selectedText = textarea.value.substring(startPos, endPos);
+
+        // Замінити виділений текст на теги
+        let newText = textarea.value.substring(0, startPos) + startTag + selectedText + endTag + textarea.value.substring(endPos);
+
+        // Вставити новий текст у текстове поле
+        textarea.value = newText;
+
+        // Оновити положення курсору
+        textarea.setSelectionRange(startPos + startTag.length, endPos + startTag.length);
+    }
+
+    // Функція для тегу <a>
+    function insertLink() {
+        let textarea = document.getElementById('text');
+        let url = prompt('Введіть URL:');
+
+        if (url) {
+            let startTag = '<a href="' + url + '">';
+            let endTag = '</a>';
+
+            // Отримати положення курсору в текстовому полі
+            let startPos = textarea.selectionStart;
+            let endPos = textarea.selectionEnd;
+
+            // Вставити теги у текстове поле
+            let newText = textarea.value.substring(0, startPos) + startTag + '...' + endTag + textarea.value.substring(endPos);
+
+            // Вставити новий текст у текстове поле
+            textarea.value = newText;
+
+            // Оновити положення курсору
+            textarea.setSelectionRange(startPos + startTag.length, startPos + startTag.length + url.length);
+        }
+    }
+
+</script>
+<script>
     function validateFile(fileInput) {
         let file = fileInput.files[0];
         let fileName = file.name;
@@ -244,6 +299,8 @@
     });
 
 </script>
+
 </div>
+
 </body>
 </html>
