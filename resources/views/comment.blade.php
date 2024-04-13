@@ -273,7 +273,7 @@
         let fileExtension = fileName.split('.').pop().toLowerCase();
 
         if (fileExtension === 'txt') {
-            var maxSize = 100 * 1024; // 100 кб у байтах
+            let maxSize = 100 * 1024; // 100 кб у байтах
             if (file.size > maxSize) {
                 alert('Максимальний розмір текстового файлу повинен бути менше 100 кБ.');
                 return false;
