@@ -1,0 +1,17 @@
+{
+    "preset": "psr12",
+    "rules": {
+        "array_syntax": {
+            "syntax": "short"
+        },
+        "no_unused_imports": true,
+        "no_trailing_comma_in_list_call": true,
+        "single_blank_line_at_eof": true,
+        "trailing_comma_in_multiline": {
+            "elements": ["arrays"]
+        },
+        "phpdoc_align": {
+            "align": "vertical"
+        }
+    }
+}
