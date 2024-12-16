@@ -2,8 +2,7 @@
 
 namespace App\Contracts\CommentContracts;
 
-
-interface CommentStoreContract{
-
+interface CommentStoreContract
+{
     public function storeComment($request);
 }

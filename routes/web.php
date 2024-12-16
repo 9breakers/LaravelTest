@@ -22,4 +22,4 @@ Route::get('/comments', [CommentController::class, 'index'])->name('comments.ind
 Route::post('/comments', [CommentController::class, 'store'])->name('comments.store');
 Route::get('/comments/{comment}/reply', [CommentController::class, 'showReplyForm'])->name('reply.form');
 Route::post('/comments/{comment}/reply', [CommentController::class, 'createReply'])->name('comments.reply');
-Route::get('/reload-captcha',[CommentController::class, 'reloadCaptcha']);
+Route::get('/reload-captcha', [CommentController::class, 'reloadCaptcha']);

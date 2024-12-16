@@ -1,13 +1,14 @@
 <?php
-namespace App\Services\CommentServices;
 
+namespace App\Services\CommentServices;
 
 use App\Contracts\CommentContracts\CommentSortIndexContract;
 use App\Models\Comment;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\Paginator;
 
-class CommentSortIndexService implements CommentSortIndexContract {
+class CommentSortIndexService implements CommentSortIndexContract
+{
     public function index(Request $request)
     {
         $sortBy = $request->input('sortBy', 'created_at');

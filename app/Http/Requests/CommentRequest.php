@@ -22,10 +22,10 @@ class CommentRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'username'=>'required|regex:/^[a-zA-Z0-9]+$/',
-            'email'=>'required|email',
-            'captcha'=>'required|captcha',
-            'text'=>'required'
+            'username' => 'required|regex:/^[a-zA-Z0-9]+$/',
+            'email' => 'required|email',
+            'captcha' => 'required|captcha',
+            'text' => 'required',
         ];
     }
 }

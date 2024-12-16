@@ -11,22 +11,21 @@ use Illuminate\Http\Request;
 
 class CommentController extends Controller
 {
-
-//    protected CommentSortIndexContract $CommentSortIndexContract;
-//
-//    public function __construct(CommentSortIndexContract $CommentSortIndexContract)
-//    {
-//        $this->CommentSortIndexContract = $CommentSortIndexContract;    Один із варіантів виклику Сервіса
-//    }
+    //    protected CommentSortIndexContract $CommentSortIndexContract;
+    //
+    //    public function __construct(CommentSortIndexContract $CommentSortIndexContract)
+    //    {
+    //        $this->CommentSortIndexContract = $CommentSortIndexContract;    Один із варіантів виклику Сервіса
+    //    }
 
     public function index(Request $request, CommentSortIndexContract $CommentSortIndexContract)
     {
-//        $comments = $this->CommentSortIndexContract->index($request); // Виклик через __construct
-        $comments =$CommentSortIndexContract->index($request);
+        //        $comments = $this->CommentSortIndexContract->index($request); // Виклик через __construct
+        $comments = $CommentSortIndexContract->index($request);
         $sortDirection = $request->input('sortDirection', 'desc'); // Значення за замовчуванням
         return view('comment', compact('comments', 'sortDirection'));
     }
-    public function store(CommentRequest $request,  CommentTagHTMLContract $commentTagHTMLContract, CommentStoreService $commentService)
+    public function store(CommentRequest $request, CommentTagHTMLContract $commentTagHTMLContract, CommentStoreService $commentService)
     {
         if (!$commentTagHTMLContract->validateTagComment($request)) {
             return redirect()->back()->withInput()->with('error', 'Невірні теги в коментарі');
@@ -40,7 +39,7 @@ class CommentController extends Controller
     {
         $comment = Comment::findOrFail($comment);
 
-        return view('reply_form' ,['comment' => $comment]);
+        return view('reply_form', ['comment' => $comment]);
     }
 
     public function createReply(CommentRequest $request, $parentId)
@@ -54,8 +53,9 @@ class CommentController extends Controller
         return redirect()->route('/comments.index');
     }
 
-    public function reloadCaptcha(){
-        return response()->json(['captcha'=>captcha_img()]);
+    public function reloadCaptcha()
+    {
+        return response()->json(['captcha' => captcha_img()]);
     }
 
 }
